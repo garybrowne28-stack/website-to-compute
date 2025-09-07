@@ -1,0 +1,540 @@
+import React, { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { 
+  ShieldCheck, BrainCircuit, Briefcase, GraduationCap, Wallet, Layers,
+  Mail, BookOpenText, LineChart, Users, ArrowRight, Search, Sparkles, Link2
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// Single-file React app for a content site about hedging against AI-driven job loss.
+// TailwindCSS, shadcn/ui, lucide-react, and framer-motion are used for styling and UX.
+// Replace the placeholder content arrays with your real posts/resources.
+
+const NAV = [
+  { key: "home", label: "Home" },
+  { key: "blog", label: "Articles" },
+  { key: "resources", label: "Resources" },
+  { key: "community", label: "Community" },
+  { key: "about", label: "About" },
+  { key: "contact", label: "Contact" },
+];
+
+const FEATURED = [
+  {
+    id: "f1",
+    title: "Protect Your Career in the Age of AI",
+    excerpt: "A practical framework for hedging risk, reskilling, and compounding your value.",
+    tags: ["AI & Jobs", "Career Strategy"],
+    icon: <ShieldCheck className="h-5 w-5" />,
+  },
+  {
+    id: "f2",
+    title: "Skills That Compound (and Resist Automation)",
+    excerpt: "Ten skill stacks that remain valuable as models improve.",
+    tags: ["Reskilling", "Skill Stacks"],
+    icon: <GraduationCap className="h-5 w-5" />,
+  },
+  {
+    id: "f3",
+    title: "Side Income Flywheels You Can Start This Month",
+    excerpt: "Low-capital, AI-leveraged ideas to diversify income.",
+    tags: ["Side Hustles", "Entrepreneurship"],
+    icon: <Wallet className="h-5 w-5" />,
+  },
+];
+
+const POSTS = [
+  {
+    id: "p1",
+    title: "Top 12 Roles Poised to Grow Despite AI",
+    category: "AI & Jobs",
+    minutes: 7,
+    summary:
+      "From supply chain leadership to compliance and relationship-heavy sales, here is where human judgment still shines.",
+  },
+  {
+    id: "p2",
+    title: "A 90‑Day Reskilling Plan: From Zero to Employable",
+    category: "Reskilling",
+    minutes: 8,
+    summary:
+      "A weekly roadmap with projects, proof-of-work, and a portfolio checklist.",
+  },
+  {
+    id: "p3",
+    title: "Build an AI‑Resistant Small Business: Playbooks and Margins",
+    category: "Entrepreneurship",
+    minutes: 9,
+    summary:
+      "Local services, compliance-heavy niches, and operations-driven moats you can start lean.",
+  },
+  {
+    id: "p4",
+    title: "Personal Finance Armor: 6 Buffers Against Disruption",
+    category: "Finance",
+    minutes: 6,
+    summary:
+      "Emergency funds, cashflow ladders, and insurance decisions that buy you time to pivot.",
+  },
+  {
+    id: "p5",
+    title: "Case Study: Pivoting a Warehouse Supervisor into Revenue Ops",
+    category: "Case Study",
+    minutes: 6,
+    summary:
+      "Translating operations metrics into GTM value with process and tooling.",
+  },
+];
+
+const RESOURCES = [
+  {
+    title: "AI‑Resistant Career Roadmap (Free PDF)",
+    desc: "A step-by-step plan to assess risk, reskill, and ship proof-of-work.",
+    cta: "Download",
+  },
+  {
+    title: "Budget & Runway Sheet",
+    desc: "Spreadsheet to model monthly cashflow, debt paydown, and 6–12 month runway.",
+    cta: "Get Sheet",
+  },
+  {
+    title: "Certification Tracker",
+    desc: "Compare cost, time, ROI, and hiring signal for popular credentials.",
+    cta: "Use Template",
+  },
+  {
+    title: "Side Hustle Idea Bank",
+    desc: "200+ ideas bucketed by startup cost, ramp time, and defensibility.",
+    cta: "Browse",
+  },
+];
+
+const FAQ = [
+  {
+    q: "Can I monetize content from this site?",
+    a: "Yes. All original content you create is yours. If you sell templates or courses, include your own license terms.",
+  },
+  {
+    q: "How do I know which skills to learn?",
+    a: "Start from your strengths and industry needs. Then layer data, systems, and communication—skills that compound.",
+  },
+  {
+    q: "Is this site just for tech roles?",
+    a: "No. We cover operations, logistics, healthcare, trades, small business, and more—anywhere AI changes workflows.",
+  },
+];
+
+function SectionLabel({ icon, children }: { icon?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
+      {icon}
+      <span>{children}</span>
+    </div>
+  );
+}
+
+function Header({ current, onNavigate }: { current: string; onNavigate: (k: string) => void }) {
+  return (
+    <header className="sticky top-0 z-50 backdrop-blur bg-white/70 border-b">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="h-9 w-9 rounded-2xl bg-black text-white grid place-items-center shadow">
+            <BrainCircuit className="h-5 w-5" />
+          </div>
+          <span className="font-semibold tracking-tight">Future‑Proof Careers</span>
+        </div>
+        <nav className="hidden md:flex items-center gap-2">
+          {NAV.map((n) => (
+            <Button
+              key={n.key}
+              variant={current === n.key ? "default" : "ghost"}
+              className="rounded-xl"
+              onClick={() => onNavigate(n.key)}
+            >
+              {n.label}
+            </Button>
+          ))}
+        </nav>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" className="rounded-xl hidden sm:inline-flex" onClick={() => onNavigate("newsletter")}>Newsletter</Button>
+          <Button className="rounded-xl" onClick={() => onNavigate("resources")}>Get the Guide</Button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function Hero({ onPrimary }: { onPrimary: () => void }) {
+  return (
+    <section className="relative overflow-hidden">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <SectionLabel icon={<ShieldCheck className="h-4 w-4" />}>Hedge Against AI Disruption</SectionLabel>
+          <h1 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
+            Protect your career. Build resilient income. Stay valuable.
+          </h1>
+          <p className="mt-4 text-muted-foreground max-w-2xl">
+            Practical playbooks to reduce risk from automation: reskilling plans, income diversification, and career strategies
+            tested in the real world.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button className="rounded-xl" size="lg" onClick={onPrimary}>
+              Start with the Free Guide <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <Button className="rounded-xl" variant="outline" size="lg">
+              Explore Articles
+            </Button>
+          </div>
+        </motion.div>
+      </div>
+      <div className="pointer-events-none absolute inset-x-0 -bottom-24 h-48 bg-gradient-to-t from-black/5 to-transparent" />
+    </section>
+  );
+}
+
+function FeatureGrid() {
+  return (
+    <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {FEATURED.map((f) => (
+          <Card key={f.id} className="rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+            <CardHeader>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">{f.icon}<span>{f.tags.join(" • ")}</span></div>
+              <CardTitle className="mt-1 text-xl leading-snug">{f.title}</CardTitle>
+              <CardDescription>{f.excerpt}</CardDescription>
+            </CardHeader>
+            <CardFooter className="pt-0">
+              <Button variant="ghost" className="rounded-xl">
+                Read more <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PostList() {
+  const [query, setQuery] = useState("");
+  const filtered = useMemo(() => {
+    if (!query.trim()) return POSTS;
+    const q = query.toLowerCase();
+    return POSTS.filter(p => p.title.toLowerCase().includes(q) || p.summary.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+  }, [query]);
+
+  return (
+    <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
+      <div className="flex items-center gap-3 mb-4">
+        <SectionLabel icon={<BookOpenText className="h-4 w-4" />}>Latest Articles</SectionLabel>
+      </div>
+
+      <div className="mb-6 flex items-center gap-2">
+        <div className="relative w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search topics, e.g. reskilling, finance, logistics" className="pl-9 rounded-xl" />
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {filtered.map((p) => (
+          <Card key={p.id} className="rounded-2xl">
+            <CardHeader>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Badge variant="secondary" className="rounded-full">{p.category}</Badge>
+                <span>• {p.minutes} min read</span>
+              </div>
+              <CardTitle className="text-lg leading-snug">{p.title}</CardTitle>
+              <CardDescription>{p.summary}</CardDescription>
+            </CardHeader>
+            <CardFooter>
+              <Button variant="ghost" className="rounded-xl">Open <ArrowRight className="ml-2 h-4 w-4" /></Button>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ResourceLibrary() {
+  return (
+    <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
+      <div className="flex items-center gap-3 mb-6">
+        <SectionLabel icon={<Layers className="h-4 w-4" />}>Resources</SectionLabel>
+        <p className="text-muted-foreground">Download guides, templates, and idea banks.</p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {RESOURCES.map((r) => (
+          <Card key={r.title} className="rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-lg leading-snug">{r.title}</CardTitle>
+              <CardDescription>{r.desc}</CardDescription>
+            </CardHeader>
+            <CardFooter>
+              <Button className="rounded-xl">{r.cta}</Button>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+
+      <Tabs defaultValue="stacks" className="mt-10">
+        <TabsList className="rounded-xl">
+          <TabsTrigger value="stacks" className="rounded-xl">Skill Stacks</TabsTrigger>
+          <TabsTrigger value="hustles" className="rounded-xl">Side Hustles</TabsTrigger>
+          <TabsTrigger value="finance" className="rounded-xl">Finance Buffers</TabsTrigger>
+        </TabsList>
+        <TabsContent value="stacks" className="mt-4">
+          <Card className="rounded-2xl">
+            <CardHeader>
+              <CardTitle>Skill stacks that resist automation</CardTitle>
+              <CardDescription>Combine 1) domain ops, 2) data & systems, 3) communication & leadership.</CardDescription>
+            </CardHeader>
+            <CardContent className="prose max-w-none text-sm">
+              <ul className="list-disc pl-5">
+                <li>Supply Chain + SQL + Workflow Automation</li>
+                <li>Clinical Ops + QA/Compliance + Analytics</li>
+                <li>Trades + Project Management + Client Acquisition</li>
+                <li>Education + Instructional Design + LLM Tooling</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="hustles" className="mt-4">
+          <Card className="rounded-2xl">
+            <CardHeader>
+              <CardTitle>Low-capital income flywheels</CardTitle>
+              <CardDescription>Launch small, iterate weekly, document proof‑of‑work.</CardDescription>
+            </CardHeader>
+            <CardContent className="prose max-w-none text-sm">
+              <ul className="list-disc pl-5">
+                <li>Local ops consulting (routing, staffing, SOPs)</li>
+                <li>Regulated-document prep services (permits, forms)</li>
+                <li>Community classes (Excel, budgeting, AI basics)</li>
+                <li>Maintenance/handyman with service contracts</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="finance" className="mt-4">
+          <Card className="rounded-2xl">
+            <CardHeader>
+              <CardTitle>Financial buffers that buy time</CardTitle>
+              <CardDescription>Reduce volatility while you pivot into new work.</CardDescription>
+            </CardHeader>
+            <CardContent className="prose max-w-none text-sm">
+              <ul className="list-disc pl-5">
+                <li>3–6 months of expenses (laddered savings goals)</li>
+                <li>Income diversification to 2–3 streams</li>
+                <li>Upskill budget (certs, tools, portfolio hosting)</li>
+                <li>Right-size insurance (disability, term life)</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </section>
+  );
+}
+
+function Community() {
+  return (
+    <section className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
+      <div className="flex items-center gap-2 mb-6">
+        <SectionLabel icon={<Users className="h-4 w-4" />}>Community</SectionLabel>
+      </div>
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle>Join the conversation</CardTitle>
+          <CardDescription>Connect with people future‑proofing careers, compare notes, and swap opportunities.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2 text-sm">
+            <p className="font-medium">Where we hang out</p>
+            <ul className="list-disc pl-5 text-muted-foreground">
+              <li>Discord for daily chat and Q&A</li>
+              <li>Monthly live workshops (recorded)</li>
+              <li>Member-only templates and trackers</li>
+            </ul>
+          </div>
+          <div className="rounded-xl border p-4">
+            <p className="text-sm">Request an invite</p>
+            <div className="mt-3 grid gap-2">
+              <Input placeholder="Your email" className="rounded-xl" />
+              <Input placeholder="Your goal (1–2 sentences)" className="rounded-xl" />
+              <Button className="rounded-xl">Request Access</Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </section>
+  );
+}
+
+function About() {
+  const bullets = [
+    { icon: <Briefcase className="h-4 w-4" />, text: "Career strategy for real operators, not just coders." },
+    { icon: <LineChart className="h-4 w-4" />, text: "Data‑driven playbooks and proof‑of‑work portfolios." },
+    { icon: <Sparkles className="h-4 w-4" />, text: "Practical, repeatable steps you can start this week." },
+  ];
+  return (
+    <section className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
+      <div className="flex items-center gap-2 mb-6">
+        <SectionLabel icon={<BrainCircuit className="h-4 w-4" />}>About</SectionLabel>
+      </div>
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle>Why this site exists</CardTitle>
+          <CardDescription>Automation will change work. With a plan, you can benefit from it.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-6">
+          <p className="text-sm text-muted-foreground">
+            We curate evidence‑based paths to reduce career risk from AI. You will find roadmaps for reskilling,
+            playbooks for starting lean businesses, and templates for building financial buffers.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-3">
+            {bullets.map((b, i) => (
+              <div key={i} className="flex items-start gap-2 rounded-xl border p-3">
+                {b.icon}
+                <span className="text-sm">{b.text}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </section>
+  );
+}
+
+function Contact() {
+  return (
+    <section className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-10">
+      <div className="flex items-center gap-2 mb-6">
+        <SectionLabel icon={<Mail className="h-4 w-4" />}>Contact</SectionLabel>
+      </div>
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle>Get in touch</CardTitle>
+          <CardDescription>Have a question, partnership idea, or story to share?</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3">
+            <div className="grid sm:grid-cols-2 gap-3">
+              <Input placeholder="First name" className="rounded-xl" />
+              <Input placeholder="Last name" className="rounded-xl" />
+            </div>
+            <Input placeholder="Email" className="rounded-xl" />
+            <Textarea placeholder="Message" className="rounded-xl min-h-[120px]" />
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button className="rounded-xl">Send</Button>
+        </CardFooter>
+      </Card>
+    </section>
+  );
+}
+
+function Newsletter() {
+  return (
+    <section className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-10">
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle>Join the newsletter</CardTitle>
+          <CardDescription>Get one actionable play each week to future‑proof your income.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Input placeholder="Your email" className="sm:col-span-2 rounded-xl" />
+            <Button className="rounded-xl">Subscribe</Button>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">By subscribing you agree to receive occasional emails. Unsubscribe anytime.</p>
+        </CardContent>
+      </Card>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="border-t mt-10">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8 grid gap-6 sm:grid-cols-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-2xl bg-black text-white grid place-items-center">
+              <BrainCircuit className="h-4 w-4" />
+            </div>
+            <span className="font-semibold">Future‑Proof Careers</span>
+          </div>
+          <p className="mt-3 text-sm text-muted-foreground">Playbooks to hedge against AI disruption and build resilient income.</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div>
+            <p className="font-medium mb-2">Explore</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li className="hover:text-foreground cursor-pointer">Articles</li>
+              <li className="hover:text-foreground cursor-pointer">Resources</li>
+              <li className="hover:text-foreground cursor-pointer">Community</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-medium mb-2">Company</p>
+            <ul className="space-y-1 text-muted-foreground">
+              <li className="hover:text-foreground cursor-pointer">About</li>
+              <li className="hover:text-foreground cursor-pointer">Contact</li>
+            </ul>
+          </div>
+        </div>
+        <div className="text-sm text-muted-foreground">
+          © {new Date().getFullYear()} Future‑Proof Careers. All rights reserved.
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+export default function App() {
+  const [route, setRoute] = useState("home");
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
+      <Header current={route} onNavigate={setRoute} />
+
+      {route === "home" && (
+        <>
+          <Hero onPrimary={() => setRoute("resources")} />
+          <FeatureGrid />
+          <PostList />
+          <ResourceLibrary />
+          <Newsletter />
+        </>
+      )}
+
+      {route === "blog" && (
+        <>
+          <Hero onPrimary={() => setRoute("newsletter")} />
+          <PostList />
+        </>
+      )}
+
+      {route === "resources" && (
+        <>
+          <Hero onPrimary={() => setRoute("newsletter")} />
+          <ResourceLibrary />
+        </>
+      )}
+
+      {route === "community" && <Community />}
+      {route === "about" && <About />}
+      {route === "contact" && <Contact />}
+      {route === "newsletter" && <Newsletter />}
+
+      <Footer />
+    </div>
+  );
+}
